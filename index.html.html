@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Portal do Parceiro — Tática</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+:root{--azul:#0D2026;--dourado:#FED26C;--verde:#2ecc71;--azul-c:#3498db;--vermelho:#e74c3c;--bg:#f0f2f5;--card:#fff;--texto:#1a1a2e;--cinza:#888;--sidebar:260px}
+body{background:var(--bg);color:var(--texto);min-height:100vh}
+
+/* LOGIN */
+/* LOGIN SPLIT SCREEN */
+#screen-login{display:flex;min-height:100vh;margin:0;padding:0}
+.login-left{flex:1;background:var(--azul);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;gap:32px}
+.login-left-logo{width:200px;object-fit:contain}
+.login-left-text{text-align:center;color:#fff}
+.login-left-text h1{font-size:1.6rem;font-weight:800;color:var(--dourado);margin-bottom:10px}
+.login-left-text p{color:#aac;font-size:.9rem;line-height:1.7;max-width:320px}
+.login-right{flex:1;background:#f5f6fa;display:flex;align-items:center;justify-content:center;padding:60px 48px}
+.login-form-wrap{width:100%;max-width:400px}
+.login-form-wrap h2{font-size:1.8rem;font-weight:800;color:var(--azul);margin-bottom:6px}
+.login-form-wrap>p{font-size:.88rem;color:var(--cinza);margin-bottom:32px}
+.lfield{margin-bottom:18px}
+.lfield label{display:block;font-size:.75rem;color:var(--cinza);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.lfield input{width:100%;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:12px;font-size:.95rem;outline:none;background:#fff;transition:.2s;color:var(--texto)}
+.lfield input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(13,32,38,.08)}
+.btn-login{width:100%;padding:15px;background:var(--azul);color:var(--dourado);font-weight:700;font-size:1rem;border:none;border-radius:12px;cursor:pointer;transition:.2s;margin-top:4px;letter-spacing:.3px}
+.btn-login:hover{background:#1a3a44}
+.login-err{color:var(--vermelho);font-size:.82rem;margin-top:12px;text-align:center;display:none;padding:10px;background:#fff5f5;border-radius:10px;border:1px solid #fcd0d0}
+@media(max-width:767px){
+  #screen-login{flex-direction:column}
+  .login-left{flex:none;padding:40px 24px;min-height:220px}
+  .login-left-logo{width:140px}
+  .login-right{padding:36px 24px}
+}
+.login-logo-box{background:var(--azul);border-radius:16px;padding:14px;width:72px;height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.login-logo-box img{width:48px;height:48px;object-fit:contain}
+.login-card h2{font-size:1.4rem;color:var(--texto);font-weight:700;margin-bottom:6px}
+.login-card p{font-size:.83rem;color:var(--cinza);margin-bottom:24px}
+.field label{display:block;font-size:.73rem;color:var(--cinza);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.field input{width:100%;padding:13px 14px;border:1.5px solid #e8e8e8;border-radius:12px;font-size:.95rem;outline:none;background:#fafafa;margin-bottom:16px;transition:.2s}
+.field input:focus{border-color:var(--dourado);background:#fff}
+.btn-primary{width:100%;padding:15px;background:var(--dourado);color:var(--azul);font-weight:700;font-size:1rem;border:none;border-radius:14px;cursor:pointer;transition:.2s}
+.btn-primary:hover{opacity:.9}
+.login-err{color:var(--vermelho);font-size:.82rem;margin-top:10px;text-align:center;display:none;padding:8px;background:#fff5f5;border-radius:8px}
+
+/* APP LAYOUT */
+#app,#app-admin{display:none;min-height:100vh}
+.app-layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--azul);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar-logo{padding:20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sidebar-logo img{width:36px;height:36px;border-radius:8px;object-fit:contain}
+.sidebar-logo h3{color:#fff;font-size:.9rem;font-weight:700}
+.sidebar-logo p{color:#aac;font-size:.68rem}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.snav{display:flex;align-items:center;gap:12px;padding:13px 20px;color:#aac;font-size:.88rem;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.2s;border-left:3px solid transparent}
+.snav:hover{background:rgba(255,255,255,.05);color:#fff}
+.snav.active{background:rgba(254,210,108,.1);color:var(--dourado);border-left-color:var(--dourado)}
+.snav svg{width:18px;height:18px;stroke-width:2;flex-shrink:0}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-footer .uname{font-size:.78rem;color:#aac;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:#aac;border-radius:10px;cursor:pointer;font-size:.82rem}
+.btn-logout:hover{background:rgba(255,255,255,.1);color:#fff}
+
+/* MAIN */
+.main-content{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:1.05rem;font-weight:700;color:var(--azul)}
+.topbar-user{display:flex;align-items:center;gap:10px}
+.user-avatar{width:36px;height:36px;background:var(--azul);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--dourado);font-weight:700;font-size:.88rem;flex-shrink:0}
+.user-name{font-size:.83rem;font-weight:600;color:var(--texto);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.user-role{font-size:.7rem;color:var(--cinza);text-align:right}
+.page-content{padding:24px;flex:1}
+
+/* MOBILE TOPBAR */
+.mobile-topbar{display:none;background:var(--azul);padding:13px 16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.mobile-topbar .tb-nome{font-size:.88rem;color:#fff;font-weight:600}
+.mobile-topbar .tb-sub{font-size:.67rem;color:#aac}
+.btn-logout-sm{background:none;border:1px solid rgba(255,255,255,.3);color:#aac;border-radius:8px;padding:5px 10px;font-size:.72rem;cursor:pointer}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--azul);z-index:200;border-top:1px solid rgba(255,255,255,.1)}
+.mobile-nav{flex-direction:row}
+.mnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;cursor:pointer;color:#aac;font-size:.58rem;gap:2px;border:none;background:none;border-top:3px solid transparent}
+.mnav.active{color:var(--dourado);border-top-color:var(--dourado)}
+.mnav svg{width:20px;height:20px;stroke-width:2}
+
+/* CARDS */
+.cards-totais{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.card-total{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid transparent}
+.card-total .lbl{font-size:.72rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.card-total .vlr{font-size:1.4rem;font-weight:700;margin-top:6px}
+.card-total .sub{font-size:.7rem;color:var(--cinza);margin-top:3px}
+.ct-pago{border-left-color:var(--verde)}.ct-pago .vlr{color:var(--verde)}
+.ct-prev{border-left-color:var(--azul-c)}.ct-prev .vlr{color:var(--azul-c)}
+.ct-atr{border-left-color:var(--vermelho)}.ct-atr .vlr{color:var(--vermelho)}
+
+/* GRÁFICO */
+.grafico-card{background:var(--card);border-radius:14px;padding:18px;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.grafico-title{font-size:.78rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:14px}
+.grafico-bars{display:flex;align-items:flex-end;gap:12px;height:90px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.bar{width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:height .5s}
+.bar-lbl{font-size:.68rem;color:var(--cinza)}
+.bar-val{font-size:.7rem;font-weight:600}
+
+/* TABLE CARD */
+.table-card{background:var(--card);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden;margin-bottom:24px}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;flex-wrap:wrap;gap:10px}
+.table-header h3{font-size:.92rem;font-weight:700;color:var(--azul)}
+.filtros{display:flex;gap:6px;flex-wrap:wrap}
+.filtro-btn{padding:5px 12px;border-radius:20px;border:1.5px solid #e0e0e0;background:#fff;color:#666;font-size:.73rem;font-weight:600;cursor:pointer;transition:.2s}
+.filtro-btn.active{background:var(--azul);color:var(--dourado);border-color:var(--azul)}
+table.dt{width:100%;border-collapse:collapse;font-size:.83rem}
+.dt th{background:#f8f9fa;color:var(--cinza);font-weight:600;padding:11px 16px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.3px}
+.dt td{padding:13px 16px;border-bottom:1px solid #f5f5f5}
+.dt tr:last-child td{border:none}
+.dt tr:hover td{background:#fafafa}
+.badge{padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.badge-pago{background:#d5f5e3;color:#1a8a4a}
+.badge-prev{background:#d6eaf8;color:#1a6aa5}
+.badge-atr{background:#fadbd8;color:#a93226}
+.badge-aceite{background:#fef9e7;color:#b7950b}
+
+/* RECIBO */
+.recibo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.recibo-card{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.recibo-top{background:var(--azul);padding:18px 20px;display:flex;align-items:center;gap:12px}
+.recibo-top img{width:40px;height:40px;border-radius:8px}
+.recibo-top h3{color:var(--dourado);font-size:.92rem;font-weight:700}
+.recibo-top p{color:#aac;font-size:.7rem;margin-top:2px}
+.recibo-body{padding:18px}
+.recibo-info{background:#f8f9fa;border-radius:8px;padding:12px;margin-bottom:14px;font-size:.82rem;line-height:1.9;color:#555}
+.recibo-info strong{color:var(--azul)}
+.recibo-row{display:flex;justify-content:space-between;font-size:.83rem;padding:9px 0;border-bottom:1px solid #f0f0f0}
+.recibo-row:last-child{border:none}
+.r-label{color:#444;flex:1}
+.r-val{font-weight:700}
+.r-badge{font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:6px;background:#fef9e7;color:#b7950b;margin-left:4px}
+.recibo-total{display:flex;justify-content:space-between;font-size:.95rem;font-weight:700;margin-top:12px;padding:12px;background:var(--azul);border-radius:8px;color:#fff}
+.recibo-total span:last-child{color:var(--dourado)}
+
+/* ASSINATURA */
+.assin-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.assin-card h3{font-size:.92rem;font-weight:700;color:var(--azul);margin-bottom:4px}
+.assin-card p{font-size:.78rem;color:var(--cinza);margin-bottom:14px}
+.assin-input{width:100%;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:.92rem;outline:none;background:#fafafa;margin-bottom:12px}
+.assin-input:focus{border-color:var(--dourado)}
+.assin-preview{border:2px solid var(--verde);border-radius:10px;padding:14px;margin-bottom:12px;text-align:center;display:none;background:#f0fff4}
+.assin-preview small{font-size:.7rem;color:var(--cinza);display:block;margin-bottom:6px}
+canvas#cvs-assin{width:100%;max-width:380px;height:85px;display:block;margin:0 auto}
+.assin-nome-txt{font-size:.75rem;color:#555;margin-top:6px;border-top:1px solid #eee;padding-top:6px}
+.assin-erro{color:var(--vermelho);font-size:.78rem;padding:8px;background:#fff5f5;border-radius:8px;margin-bottom:10px;display:none}
+.btn-conf{width:100%;padding:13px;background:var(--azul);color:var(--dourado);border:none;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer}
+.assin-ok{text-align:center;padding:26px;display:none}
+.assin-ok .ok-icon{font-size:2.8rem}
+.assin-ok h3{color:var(--verde);font-weight:700;margin-top:10px}
+.assin-ok p{color:#777;font-size:.8rem;margin-top:5px}
+.btn-pdf{width:100%;padding:12px;background:var(--dourado);color:var(--azul);border:none;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer;margin-top:12px}
+
+/* CONSULTA */
+.consulta-wrap{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.search-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.search-card h3{font-size:.92rem;font-weight:700;color:var(--azul);margin-bottom:14px}
+.search-input{width:100%;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:.92rem;outline:none;background:#fafafa;margin-bottom:12px}
+.search-input:focus{border-color:var(--dourado)}
+.btn-buscar{width:100%;padding:12px;background:var(--azul);color:var(--dourado);border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem}
+.res-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:none}
+.res-nome{font-size:1rem;font-weight:700;color:var(--azul);margin-bottom:8px}
+.res-obs{background:#f8f9fa;border-radius:8px;padding:12px;font-size:.82rem;color:#555;margin:10px 0;border-left:3px solid var(--dourado);line-height:1.7}
+.btn-wpp{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;text-decoration:none;margin-top:8px}
+
+/* FORMULÁRIO */
+.form-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.form-card h3{font-size:.92rem;font-weight:700;color:var(--azul);margin-bottom:4px}
+.form-card p{font-size:.78rem;color:var(--cinza);margin-bottom:18px}
+.field label{display:block;font-size:.72rem;color:var(--cinza);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field textarea{width:100%;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:.9rem;outline:none;background:#fafafa;margin-bottom:14px;font-family:inherit;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--dourado);background:#fff}
+.field textarea{resize:vertical;min-height:90px}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.parceiro-card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.pc-nome{font-size:.92rem;font-weight:700;color:var(--azul)}
+.pc-email{font-size:.73rem;color:var(--cinza);margin-top:3px}
+.pc-vals{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.pc-tag{font-size:.7rem;font-weight:600;padding:3px 9px;border-radius:8px}
+.btn-wpp-sm{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:#25D366;color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:.8rem}
+
+.empty{text-align:center;color:var(--cinza);padding:36px;font-size:.86rem}
+.empty-recibo{text-align:center;color:var(--cinza);padding:18px;font-size:.86rem}
+
+@media(min-width:768px){
+  .login-brand{display:flex}
+  .login-card{border-radius:0 24px 24px 0}
+  .mobile-topbar,.mobile-nav{display:none!important}
+  .sidebar{display:flex}
+  .main-content{margin-left:var(--sidebar)}
+}
+@media(max-width:767px){
+  .sidebar{display:none!important}
+  .main-content{margin-left:0;padding-bottom:72px}
+  .mobile-topbar{display:flex}
+  .mobile-nav{display:flex}
+  .page-content{padding:14px}
+  .cards-totais{gap:8px}
+  .card-total .vlr{font-size:1rem}
+  .recibo-wrap,.consulta-wrap{grid-template-columns:1fr}
+  .admin-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .card-total{padding:12px 8px}
+  .card-total .vlr{font-size:.9rem}
+  .card-total .lbl{font-size:.6rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="screen-login">
+  <div class="login-left">
+    <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" class="login-left-logo"/>
+    <div class="login-left-text">
+      <h1>Central de Parceiros</h1>
+      <p>Acompanhe comissões, assine recibos e consulte indicações em um só lugar.</p>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <h2>Bem-vindo de volta!</h2>
+      <p>Acesse sua conta para continuar</p>
+      <div class="lfield">
+        <label>E-mail</label>
+        <input id="inp-user" type="email" placeholder="seu@email.com" autocomplete="username"/>
+      </div>
+      <div class="lfield">
+        <label>Senha</label>
+        <input id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Entrar</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP PARCEIRO -->
+<div id="app">
+  <div class="mobile-topbar">
+    <div><div class="tb-nome" id="tb-nome-m"></div><div class="tb-sub">Parceiro Tática</div></div>
+    <button class="btn-logout-sm" onclick="doLogout()">Sair</button>
+  </div>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png"/>
+        <div><h3>Central de Parceiros</h3><p>Tática Gestão Contábil</p></div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="snav active" onclick="goTo('painel',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Painel
+        </button>
+        <button class="snav" onclick="goTo('aceite',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+          Aceite Digital
+        </button>
+        <button class="snav" onclick="goTo('consulta',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Consulta
+        </button>
+        <button class="snav" onclick="goTo('clientes',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Meus Clientes
+        </button>
+        <button class="snav" onclick="goTo('indicar',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Indicar Cliente
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="uname" id="sidebar-nome"></div>
+        <button class="btn-logout" onclick="doLogout()">Sair da conta</button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title">Painel de Comissões</div>
+        <div class="topbar-user">
+          <div><div class="user-name" id="topbar-nome"></div><div class="user-role">Parceiro de Indicação</div></div>
+          <div class="user-avatar" id="user-avatar">?</div>
+        </div>
+      </div>
+
+      <div class="page-content">
+
+        <!-- PAINEL -->
+        <div id="screen-painel" class="screen">
+          <div class="cards-totais">
+            <div class="card-total ct-pago"><div class="lbl">Pago</div><div class="vlr" id="tot-pago">—</div><div class="sub">Total recebido</div></div>
+            <div class="card-total ct-prev"><div class="lbl">Previsto</div><div class="vlr" id="tot-prev">—</div><div class="sub">A receber</div></div>
+            <div class="card-total ct-atr"><div class="lbl">Em Atraso</div><div class="vlr" id="tot-atr">—</div><div class="sub">Pendente</div></div>
+          </div>
+          <div class="grafico-card">
+            <div class="grafico-title">Distribuição de Comissões</div>
+            <div class="grafico-bars" id="grafico-bars"></div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Minhas Indicações</h3>
+              <div class="filtros">
+                <button class="filtro-btn active" onclick="filtrar('TODOS',this)">Todos</button>
+                <button class="filtro-btn" onclick="filtrar('PAGO',this)">Pagos</button>
+                <button class="filtro-btn" onclick="filtrar('PREVISTO',this)">Previstos</button>
+                <button class="filtro-btn" onclick="filtrar('SEM_ACEITE',this)">Sem Aceite</button>
+                <button class="filtro-btn" onclick="filtrar('EM ATRASO',this)">Em Atraso</button>
+              </div>
+            </div>
+            <div id="lista-ind"><div class="empty">Carregando...</div></div>
+          </div>
+        </div>
+
+        <!-- ACEITE -->
+        <div id="screen-aceite" class="screen" style="display:none">
+          <div class="recibo-wrap">
+            <div class="recibo-card">
+              <div class="recibo-top">
+                <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png"/>
+                <div><h3>Recibo de Comissão</h3><p id="mes-ref">Carregando...</p></div>
+              </div>
+              <div class="recibo-body">
+                <div class="recibo-info">
+                  <strong>Pagador:</strong> Tática Gestão Contábil · CNPJ: 18.809.456/0001-62<br>
+                  <strong>Recebedor:</strong> <span id="rec-nome">—</span><br>
+                  <strong>Chave PIX:</strong> <span id="rec-pix">—</span>
+                </div>
+                <div id="recibo-rows"></div>
+                <div class="recibo-total" id="recibo-total-row" style="display:none">
+                  <span>Total a Receber</span><span id="recibo-total">—</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="assin-card" id="assin-area">
+                <h3>✍️ Assinatura Eletrônica</h3>
+                <p>Digite seu CPF ou CNPJ para assinar</p>
+                <input class="assin-input" id="inp-cpf" type="text" placeholder="000.000.000-00 ou 00.000.000/0001-00" oninput="validarCPF(this.value)"/>
+                <div class="assin-preview" id="assin-preview">
+                  <small>Assinatura gerada:</small>
+                  <canvas id="cvs-assin" width="380" height="85"></canvas>
+                  <div class="assin-nome-txt" id="assin-nome-txt"></div>
+                </div>
+                <div class="assin-erro" id="assin-erro"></div>
+                <button class="btn-conf" id="btn-conf" onclick="assinar()">Confirmar Aceite</button>
+              </div>
+              <div class="assin-card assin-ok" id="assin-ok">
+                <div class="ok-icon">✅</div>
+                <h3>Aceite Confirmado!</h3>
+                <p id="assin-ok-ts"></p>
+                <button class="btn-pdf" onclick="gerarPDF()">📄 Baixar Recibo em PDF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONSULTA -->
+        <div id="screen-consulta" class="screen" style="display:none">
+          <div class="consulta-wrap">
+            <div class="search-card">
+              <h3>🔍 Consultar Indicação</h3>
+              <input class="search-input" id="inp-busca" type="text" placeholder="Nome do cliente indicado..."/>
+              <button class="btn-buscar" onclick="buscar()">Consultar</button>
+            </div>
+            <div class="res-card" id="res-card">
+              <div class="res-nome" id="res-nome"></div>
+              <div id="res-status" style="margin-bottom:6px"></div>
+              <div class="res-obs" id="res-obs"></div>
+              <a id="btn-wpp" class="btn-wpp" target="_blank">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.522 5.847L.057 23.882l6.19-1.622A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.793 9.793 0 01-4.988-1.365l-.358-.214-3.71.973.99-3.614-.233-.372A9.794 9.794 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+                Falar com a Tática
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- MEUS CLIENTES -->
+        <div id="screen-clientes" class="screen" style="display:none">
+          <div class="table-card">
+            <div class="table-header"><h3>👥 Meus Clientes Ativos</h3></div>
+            <div id="lista-clientes"><div class="empty">Carregando...</div></div>
+          </div>
+        </div>
+
+        <!-- INDICAR CLIENTE -->
+        <div id="screen-indicar" class="screen" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+            <div class="form-card">
+              <h3>➕ Indicar Novo Cliente</h3>
+              <p>Ajude-nos a crescer indicando um novo cliente!</p>
+              <div class="field"><label>Nome do Cliente *</label><input id="ind-nome" type="text" placeholder="Nome completo da empresa"/></div>
+              <div class="field"><label>Email</label><input id="ind-email" type="email" placeholder="contato@empresa.com"/></div>
+              <div class="field"><label>Telefone</label><input id="ind-tel" type="text" placeholder="(82) 9xxxx-xxxx"/></div>
+              <div class="field"><label>Tipo de Serviço</label><input id="ind-tipo" type="text" placeholder="Ex: Contabilidade, Fiscal, BPO"/></div>
+              <div class="field"><label>Mensagem (opcional)</label><textarea id="ind-msg" placeholder="Conte-nos mais sobre o cliente..."></textarea></div>
+              <div id="ind-erro" style="display:none;color:var(--vermelho);font-size:.8rem;padding:8px;background:#fff5f5;border-radius:8px;margin-bottom:10px"></div>
+              <div id="ind-ok" style="display:none;color:var(--verde);font-size:.85rem;padding:10px;background:#f0fff4;border-radius:8px;margin-bottom:10px;text-align:center">✅ Indicação enviada com sucesso!</div>
+              <button class="btn-conf" id="btn-indicar" onclick="enviarIndicacao()">Enviar Indicação</button>
+            </div>
+            <div class="table-card" style="margin:0">
+              <div class="table-header"><h3>📋 Indicações em Andamento</h3></div>
+              <div id="lista-indicacoes-new"><div class="empty">Carregando...</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page-content -->
+    </div><!-- /main-content -->
+  </div><!-- /app-layout -->
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-nav">
+    <button class="mnav active" onclick="goTo('painel',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Painel
+    </button>
+    <button class="mnav" onclick="goTo('aceite',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Aceite
+    </button>
+    <button class="mnav" onclick="goTo('consulta',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Consulta
+    </button>
+    <button class="mnav" onclick="goTo('clientes',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Clientes
+    </button>
+    <button class="mnav" onclick="goTo('indicar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Indicar
+    </button>
+  </nav>
+</div>
+
+<!-- APP ADMIN -->
+<div id="app-admin">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png"/>
+        <div><h3>Tática</h3><p>Administração</p></div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="snav active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Parceiros
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="uname">Danielle — Admin</div>
+        <button class="btn-logout" onclick="doLogout()">Sair da conta</button>
+      </div>
+    </aside>
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-title">Painel Administrativo</div>
+        <div class="topbar-user">
+          <div><div class="user-name">Danielle</div><div class="user-role">Administradora</div></div>
+          <div class="user-avatar">D</div>
+        </div>
+      </div>
+      <div class="page-content">
+        <div class="cards-totais" style="grid-template-columns:1fr 1fr;max-width:460px;margin-bottom:20px">
+          <div class="card-total ct-prev"><div class="lbl">Parceiros</div><div class="vlr" id="adm-total-parceiros">—</div></div>
+          <div class="card-total ct-pago"><div class="lbl">Total Previsto</div><div class="vlr" id="adm-total-comissoes">—</div></div>
+        </div>
+        <div class="table-card" style="padding:18px">
+          <h3 style="font-size:.88rem;color:var(--azul);margin-bottom:14px">Parceiros Ativos</h3>
+          <div class="admin-grid" id="lista-parceiros"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const GAS="https://script.google.com/macros/s/AKfycbxfYiwgZUYVdJURSx8Mrf36wiBduli_bNo4x9JOnmc-ksADeT9mWmM6s0zST1E_TF-p/exec";
+const ADMIN_USER="danielle@taticacontabilidade.com",ADMIN_PASS="Tatica@2026",WPP_TATICA="558230243993";
+let TOKEN=null,NOME=null,WPP=WPP_TATICA,PIX="—",CPF="";
+let todosInd=[],filtroAtual="TODOS";
+
+async function api(p){const r=await fetch(GAS+"?"+new URLSearchParams(p));return r.json();}
+function fmt(v){return"R$\u00a0"+Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2});}
+function fmtK(v){return v>=1000?"R$"+(v/1000).toFixed(1)+"k":fmt(v);}
+
+async function doLogin(){
+  const u=document.getElementById("inp-user").value.trim();
+  const s=document.getElementById("inp-pass").value.trim();
+  const err=document.getElementById("login-err");
+  const btn=document.querySelector(".btn-login");
+  btn.textContent="Entrando...";btn.disabled=true;
+  if(u.toLowerCase()===ADMIN_USER.toLowerCase()&&s===ADMIN_PASS){
+    document.getElementById("screen-login").style.display="none";
+    document.getElementById("app-admin").style.display="block";
+    carregarAdmin();btn.textContent="Entrar";btn.disabled=false;return;
+  }
+  try{
+    const r=await api({action:"login",usuario:u,senha:s});
+    if(r.ok){
+      TOKEN=r.token;NOME=r.nome;WPP=r.wpp||WPP_TATICA;PIX=r.pix||"—";CPF=r.cpf||"";
+      err.style.display="none";
+      document.getElementById("screen-login").style.display="none";
+      document.getElementById("app").style.display="block";
+      document.getElementById("tb-nome-m").textContent=NOME;
+      document.getElementById("topbar-nome").textContent=NOME;
+      document.getElementById("sidebar-nome").textContent=NOME;
+      document.getElementById("user-avatar").textContent=NOME.charAt(0).toUpperCase();
+      document.getElementById("rec-nome").textContent=NOME;
+      document.getElementById("rec-pix").textContent=PIX;
+      carregarPainel();carregarRecibo();
+    } else {err.textContent=r.erro||"Usuário ou senha incorretos.";err.style.display="block";}
+  } catch(e){err.textContent="Erro de conexão. Tente novamente.";err.style.display="block";}
+  btn.textContent="Entrar";btn.disabled=false;
+
+function doLogout(){
+  TOKEN=null;NOME=null;
+  document.getElementById("screen-login").style.display="flex";
+  document.getElementById("app").style.display="none";
+  document.getElementById("app-admin").style.display="none";
+  document.getElementById("inp-user").value="";document.getElementById("inp-pass").value="";
+  document.getElementById("assin-ok").style.display="none";
+  document.getElementById("assin-area").style.display="block";
+}
+
+const pageTitles={painel:"Painel de Comissões",aceite:"Aceite Digital",consulta:"Consulta de Indicações",clientes:"Meus Clientes",indicar:"Indicar Novo Cliente"};
+function goTo(id,el){
+  document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
+  document.querySelectorAll(".snav,.mnav").forEach(n=>n.classList.remove("active"));
+  document.getElementById("screen-"+id).style.display="block";
+  document.querySelectorAll(`[onclick="goTo('${id}',this)"]`).forEach(b=>b.classList.add("active"));
+  document.getElementById("page-title").textContent=pageTitles[id]||"";
+  if(id==="clientes") carregarClientes();
+  if(id==="indicar") carregarIndicacoes();
+}
+
+async function carregarPainel(){
+  const lst=document.getElementById("lista-ind");
+  lst.innerHTML='<div class="empty">Carregando...</div>';
+  try{
+    const r=await api({action:"comissoes",token:TOKEN});
+    if(!r.ok){lst.innerHTML=`<div class="empty">${r.erro}</div>`;return;}
+    document.getElementById("tot-pago").textContent=fmt(r.totais.pago);
+    document.getElementById("tot-prev").textContent=fmt(r.totais.previsto);
+    document.getElementById("tot-atr").textContent=fmt(r.totais.atraso);
+    todosInd=r.indicacoes;renderGrafico(r.totais);renderLista("TODOS");
+  } catch(e){lst.innerHTML='<div class="empty">Erro ao carregar dados.</div>';}
+}
+
+function renderGrafico(t){
+  const max=Math.max(t.pago,t.previsto,t.atraso,1);
+  document.getElementById("grafico-bars").innerHTML=[
+    {lbl:"Pago",val:t.pago,cor:"#2ecc71"},{lbl:"Previsto",val:t.previsto,cor:"#3498db"},{lbl:"Atraso",val:t.atraso,cor:"#e74c3c"}
+  ].map(b=>`<div class="bar-wrap"><div class="bar-val">${fmtK(b.val)}</div><div class="bar" style="height:${Math.max((b.val/max)*65,4)}px;background:${b.cor}"></div><div class="bar-lbl">${b.lbl}</div></div>`).join("");
+}
+
+function filtrar(st,el){
+  filtroAtual=st;
+  document.querySelectorAll(".filtros .filtro-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");renderLista(st);
+}
+
+function renderLista(st){
+  const lst=document.getElementById("lista-ind");
+  const dados=st==="TODOS"?todosInd:todosInd.filter(i=>i.status===st);
+  if(!dados.length){lst.innerHTML='<div class="empty">Nenhuma indicação encontrada.</div>';return;}
+  const bMap={PAGO:"badge-pago",PREVISTO:"badge-prev","EM ATRASO":"badge-atr",SEM_ACEITE:"badge-aceite"};
+  const lMap={PAGO:"Pago",PREVISTO:"Previsto","EM ATRASO":"Em Atraso",SEM_ACEITE:"Sem Aceite"};
+  lst.innerHTML=`<table class="dt"><thead><tr><th>Cliente</th><th>Competência</th><th>Tipo</th><th>Parcela</th><th>Previsão</th><th>Comissão</th><th>Status</th></tr></thead><tbody>`+
+  dados.map(i=>`<tr><td style="font-weight:600">${i.id}</td><td>${i.competencia}</td><td>${i.tipo}</td><td>${i.parcela}</td><td>${i.pagamento}</td><td style="font-weight:700">${fmt(i.valor)}</td><td><span class="badge ${bMap[i.status]||"badge-prev"}">${lMap[i.status]||i.status}</span></td></tr>`).join("")+`</tbody></table>`;
+}
+
+async function carregarRecibo(){
+  try{
+    const jaAss=await api({action:"jaAssinou",token:TOKEN});
+    if(jaAss.assinou){
+      document.getElementById("mes-ref").textContent="";
+      document.getElementById("recibo-rows").innerHTML=`<div class="empty-recibo">✅ Você já assinou o recibo deste mês.<br><small>Registrado em: ${jaAss.em}</small></div>`;
+      document.getElementById("recibo-total-row").style.display="none";
+      document.getElementById("assin-area").style.display="none";return;
+    }
+    const r=await api({action:"recibo",token:TOKEN});
+    document.getElementById("mes-ref").textContent=r.ok?"Referente a: "+r.mes:"";
+    if(!r.ok||!r.itens||!r.itens.length){
+      document.getElementById("recibo-rows").innerHTML='<div class="empty-recibo">Nenhum recibo pendente no momento.</div>';
+      document.getElementById("recibo-total-row").style.display="none";
+      document.getElementById("assin-area").style.display="none";return;
+    }
+    window._reciboItens=r.itens.map(it=>({...it,valor:fmt(it.valor)}));
+    document.getElementById("recibo-rows").innerHTML=r.itens.map(it=>`<div class="recibo-row"><span class="r-label">${it.id}<br><small style="color:#999">${it.tipo} · ${it.competencia} · Parc.${it.parcela}</small>${it.semAceite?'<span class="r-badge">Pendente</span>':""}</span><span class="r-val">${fmt(it.valor)}</span></div>`).join("");
+    document.getElementById("recibo-total").textContent=fmt(r.total);
+    document.getElementById("recibo-total-row").style.display="flex";
+    document.getElementById("assin-area").style.display="block";
+  } catch(e){document.getElementById("recibo-rows").innerHTML='<div class="empty-recibo">Erro ao carregar recibo.</div>';}
+}
+
+let _nomeAssin="",_cpfAssin="",_assinBase64="";
+function limparCpf(v){return v.replace(/\D/g,"");}
+function validarCPF(val){
+  const cpf=limparCpf(val);
+  const preview=document.getElementById("assin-preview");
+  const erro=document.getElementById("assin-erro");
+  erro.style.display="none";preview.style.display="none";
+  let f=cpf;
+  if(cpf.length<=11) f=cpf.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+  else f=cpf.replace(/(\d{2})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1/$2").replace(/(\d{4})(\d{1,2})$/,"$1-$2");
+  document.getElementById("inp-cpf").value=f;
+  if(cpf.length===11||cpf.length===14){
+    if(cpf!==(CPF||"").replace(/\D/g,"")){erro.textContent="⚠️ CPF/CNPJ não corresponde ao seu cadastro.";erro.style.display="block";return;}
+    _nomeAssin=NOME;_cpfAssin=f;gerarAssinaturaCanvas(NOME,f);
+  }
+}
+function gerarAssinaturaCanvas(nome,cpf){
+  const c=document.getElementById("cvs-assin");
+  const ctx=c.getContext("2d");
+  const W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  ctx.save();let fs=40;ctx.font=`italic bold ${fs}px Georgia,serif`;
+  while(ctx.measureText(nome).width>W-40&&fs>18){fs-=2;ctx.font=`italic bold ${fs}px Georgia,serif`;}
+  ctx.fillStyle="#0D2026";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.shadowColor="rgba(0,0,0,.15)";ctx.shadowBlur=3;ctx.shadowOffsetX=1;ctx.shadowOffsetY=1;
+  ctx.translate(W/2,H/2-8);ctx.rotate(-0.04);ctx.fillText(nome,0,0);ctx.restore();
+  ctx.beginPath();ctx.moveTo(30,H-12);ctx.lineTo(W-30,H-12);ctx.strokeStyle="#0D2026";ctx.lineWidth=1;ctx.stroke();
+  _assinBase64=c.toDataURL("image/png");
+  document.getElementById("assin-nome-txt").textContent=nome+" · "+cpf;
+  document.getElementById("assin-preview").style.display="block";
+}
+async function assinar(){
+  const cpf=limparCpf(document.getElementById("inp-cpf").value);
+  const erro=document.getElementById("assin-erro");
+  if(cpf.length<11){erro.textContent="Digite seu CPF ou CNPJ completo.";erro.style.display="block";return;}
+  if(!_assinBase64){erro.textContent="CPF/CNPJ inválido.";erro.style.display="block";return;}
+  const btn=document.getElementById("btn-conf");
+  btn.textContent="Salvando...";btn.disabled=true;
+  try{
+    window._assinBase64=_assinBase64;
+    const ts=new Date().toLocaleString("pt-BR");window._tsAceite=ts;
+    const r=await api({action:"aceite",token:TOKEN,assinatura:"Assinado eletronicamente em "+ts,cpf:_cpfAssin,nomeAssin:_nomeAssin});
+    if(!r.ok) throw new Error(r.erro||"Erro");
+    setTimeout(()=>{
+      document.getElementById("assin-area").style.display="none";
+      document.getElementById("assin-ok").style.display="block";
+      document.getElementById("assin-ok-ts").textContent="Registrado em "+ts+" · "+_nomeAssin;
+    },800);
+  } catch(e){alert("Erro ao salvar. Tente novamente.");}
+  btn.textContent="Confirmar Aceite";btn.disabled=false;
+}
+function gerarPDF(){
+  const total=document.getElementById("recibo-total").textContent;
+  const mes=document.getElementById("mes-ref").textContent;
+  const ts=window._tsAceite||new Date().toLocaleString("pt-BR");
+  const assin=window._assinBase64||"";const dataHoje=new Date().toLocaleDateString("pt-BR");
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>body{font-family:Arial,sans-serif;max-width:750px;margin:0 auto;padding:30px;color:#222}.header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:4px}.logo-wrap{background:#0D2026;border-radius:10px;padding:10px;width:100px;height:100px;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}.logo{width:80px;height:80px;object-fit:contain}.titulo{font-size:1rem;font-weight:700;color:#0D2026;text-align:right}.linha{height:3px;background:linear-gradient(90deg,#FED26C,#0D2026);margin-bottom:18px}.bloco{background:#f8f9fa;border-radius:6px;padding:12px;margin-bottom:14px;font-size:.88rem;line-height:1.9}.bloco strong{color:#0D2026}table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:14px}th{background:#0D2026;color:#FED26C;padding:9px 11px;text-align:left}td{padding:8px 11px;border-bottom:1px solid #eee}.tr td{background:#0D2026;color:#fff;font-weight:700}.tr td:last-child{color:#FED26C;text-align:right}.decl{font-size:.85rem;color:#444;margin:16px 0;line-height:1.8;padding:12px;background:#fffdf0;border-left:4px solid #FED26C}.assin-wrap{margin-top:36px;display:flex;justify-content:center}.assin-box{text-align:center;width:300px;border-top:1px solid #999;padding-top:10px}.footer{margin-top:26px;border-top:1px solid #eee;padding-top:12px;font-size:.74rem;color:#888;text-align:center;line-height:2}@media print{button{display:none}}</style></head><body>
+  <div class="header"><div class="logo-wrap"><img class="logo" src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png"/></div><div class="titulo">RECIBO – CENTRAL DE<br>PARCEIROS TÁTICA</div></div>
+  <div class="linha"></div>
+  <div class="bloco"><strong>Pagador:</strong> Tática Gestão Contábil · CNPJ: 18.809.456/0001-62<br><strong>Recebedor:</strong> ${NOME}<br><strong>CPF/CNPJ:</strong> ${CPF||"—"}<br><strong>Chave PIX:</strong> ${PIX||"—"}</div>
+  <div class="bloco"><strong>${mes}</strong></div>
+  <table><thead><tr><th>Cliente</th><th>Tipo</th><th>Competência</th><th>Parcela</th><th>Previsão</th><th style="text-align:right">Comissão</th></tr></thead><tbody id="pdf-rows"></tbody>
+  <tr class="tr"><td colspan="5"><strong>Total a Receber</strong></td><td style="text-align:right"><strong>${total}</strong></td></tr></table>
+  <div class="decl">Declaro que recebi da Tática Gestão Contábil a quantia de <strong>${total}</strong>, correspondente à comissão do Programa Central de Parceiros.<br><br><strong>Forma de Pagamento:</strong> PIX — ${PIX||"—"}<br><strong>Local e Data:</strong> Maceió, ${dataHoje}.</div>
+  <div class="assin-wrap"><div class="assin-box">${assin?`<img src="${assin}" style="max-width:260px;max-height:70px;display:block;margin:0 auto 6px"/>`:""}
+  <div style="font-weight:700;color:#0D2026">${NOME}</div><div style="font-size:.7rem;color:#888;margin-top:3px">Assinado em: ${ts}</div></div></div>
+  <div class="footer">📧 financeiro@taticacontabilidade.com &nbsp;|&nbsp; 📍 Rua Machado Lemos, 226 – Maceió/AL &nbsp;|&nbsp; 📞 (82) 3024-3993</div>
+  <script>const it=${JSON.stringify(window._reciboItens||[])};const tb=document.getElementById("pdf-rows");if(it.length)tb.innerHTML=it.map(i=>'<tr><td>'+i.id+'</td><td>'+i.tipo+'</td><td>'+i.competencia+'</td><td>'+i.parcela+'</td><td>'+i.previsao+'</td><td style="text-align:right">'+i.valor+'</td></tr>').join('');window.onload=()=>window.print();<\/script></body></html>`;
+  const w=window.open("","_blank");w.document.write(html);w.document.close();
+}
+
+function stLabel(s){
+  const m={PAGO:"badge-pago",PREVISTO:"badge-prev","EM ATRASO":"badge-atr",SEM_ACEITE:"badge-aceite"};
+  const l={PAGO:"Pago ✓",PREVISTO:"Previsto","EM ATRASO":"Em Atraso",SEM_ACEITE:"Sem Aceite"};
+  return`<span class="badge ${m[s]||"badge-prev"}">${l[s]||s}</span>`;
+}
+async function buscar(){
+  const q=document.getElementById("inp-busca").value.trim();if(!q)return;
+  const card=document.getElementById("res-card");card.style.display="block";
+  document.getElementById("res-nome").textContent="Buscando...";
+  document.getElementById("res-status").innerHTML="";document.getElementById("res-obs").textContent="";
+  try{
+    const r=await api({action:"consulta",token:TOKEN,q});
+    if(r.ok&&r.resultados.length){
+      const f=r.resultados[0];
+      document.getElementById("res-nome").textContent=f.id;
+      document.getElementById("res-status").innerHTML="Status: "+stLabel(f.status);
+      document.getElementById("res-obs").innerHTML=`<b>Competência:</b> ${f.competencia}<br><b>Tipo:</b> ${f.tipo}<br><b>Parcela:</b> ${f.parcela}<br><b>Previsão:</b> ${f.pagamento}<br><b>Comissão:</b> ${fmt(f.valor)}`;
+      document.getElementById("btn-wpp").href=`https://wa.me/${WPP_TATICA}?text=Olá Tática! Sou ${NOME} e tenho dúvida sobre: ${f.id}.`;
+    } else {
+      document.getElementById("res-nome").textContent="Não encontrado";
+      document.getElementById("res-status").innerHTML='<span class="badge badge-atr">Sem resultado</span>';
+      document.getElementById("res-obs").textContent=r.erro||"Nenhum registro encontrado.";
+      document.getElementById("btn-wpp").href=`https://wa.me/${WPP_TATICA}?text=Olá Tática! Sou ${NOME} e tenho uma dúvida.`;
+    }
+  } catch(e){document.getElementById("res-nome").textContent="Erro de conexão";}
+}
+
+async function carregarClientes(){
+  const lst=document.getElementById("lista-clientes");
+  lst.innerHTML='<div class="empty">Carregando...</div>';
+  try{
+    const r=await api({action:"meusClientes",token:TOKEN});
+    if(!r.ok){lst.innerHTML=`<div class="empty">${r.erro}</div>`;return;}
+    const ativos=r.clientes.filter(c=>c.situacao.toLowerCase()==="ativo");
+    if(!ativos.length){lst.innerHTML='<div class="empty">Nenhum cliente ativo ainda.</div>';return;}
+    lst.innerHTML=`<table class="dt"><thead><tr><th>Data</th><th>Cliente</th><th>Honorários</th><th>Comissão</th><th>Situação</th></tr></thead><tbody>`+
+    ativos.map(c=>`<tr><td>${c.data}</td><td style="font-weight:600">${c.cliente}</td><td>${c.honorarios>0?fmt(c.honorarios):"—"}</td><td style="font-weight:700;color:var(--verde)">${c.comissao>0?fmt(c.comissao):"—"}</td><td><span class="badge badge-pago">Ativo</span></td></tr>`).join("")+`</tbody></table>`;
+  } catch(e){lst.innerHTML='<div class="empty">Erro ao carregar.</div>';}
+}
+
+async function carregarIndicacoes(){
+  const lst=document.getElementById("lista-indicacoes-new");
+  if(!lst)return;lst.innerHTML='<div class="empty">Carregando...</div>';
+  try{
+    const r=await api({action:"meusClientes",token:TOKEN});
+    if(!r.ok){lst.innerHTML=`<div class="empty">${r.erro}</div>`;return;}
+    const em=r.clientes.filter(c=>!["ativo"].includes(c.situacao.toLowerCase()));
+    if(!em.length){lst.innerHTML='<div class="empty">Nenhuma indicação em andamento.</div>';return;}
+    const sb=s=>{const m={"Fechado":"badge-pago","Novo":"badge-aceite","Em Contato":"badge-prev","Perdido":"badge-atr","Cancelado":"badge-atr"};return`<span class="badge ${m[s]||"badge-prev"}">${s}</span>`;};
+    lst.innerHTML=`<table class="dt"><thead><tr><th>Data</th><th>Cliente</th><th>Tipo de Serviço</th><th>Situação</th></tr></thead><tbody>`+
+    em.map(c=>`<tr><td>${c.data}</td><td style="font-weight:600">${c.cliente}</td><td>${c.tipoServico||"—"}</td><td>${sb(c.situacao)}</td></tr>`).join("")+`</tbody></table>`;
+  } catch(e){lst.innerHTML='<div class="empty">Erro ao carregar.</div>';}
+}
+
+async function enviarIndicacao(){
+  const nome=document.getElementById("ind-nome").value.trim();
+  const erro=document.getElementById("ind-erro");const ok=document.getElementById("ind-ok");
+  erro.style.display="none";ok.style.display="none";
+  if(!nome){erro.textContent="Informe o nome do cliente.";erro.style.display="block";return;}
+  const btn=document.getElementById("btn-indicar");btn.textContent="Enviando...";btn.disabled=true;
+  try{
+    const r=await api({action:"indicarCliente",token:TOKEN,nomeCliente:nome,
+      email:document.getElementById("ind-email").value.trim(),
+      telefone:document.getElementById("ind-tel").value.trim(),
+      tipoServico:document.getElementById("ind-tipo").value.trim(),
+      mensagem:document.getElementById("ind-msg").value.trim()});
+    if(r.ok){
+      ok.style.display="block";
+      ["ind-nome","ind-email","ind-tel","ind-tipo","ind-msg"].forEach(id=>document.getElementById(id).value="");
+    } else {erro.textContent=r.erro||"Erro ao enviar.";erro.style.display="block";}
+  } catch(e){erro.textContent="Erro de conexão.";erro.style.display="block";}
+  btn.textContent="Enviar Indicação";btn.disabled=false;
+}
+
+async function carregarAdmin(){
+  const lst=document.getElementById("lista-parceiros");
+  lst.innerHTML='<div class="empty">Carregando...</div>';
+  try{
+    const r=await api({action:"admin",senha:ADMIN_PASS});
+    if(!r.ok){lst.innerHTML=`<div class="empty">${r.erro}</div>`;return;}
+    document.getElementById("adm-total-parceiros").textContent=r.parceiros.length;
+    let tp=0;r.parceiros.forEach(p=>tp+=p.previsto||0);
+    document.getElementById("adm-total-comissoes").textContent=fmtK(tp);
+    lst.innerHTML=r.parceiros.map(p=>`
+      <div class="parceiro-card">
+        <div class="pc-nome">${p.nome}</div><div class="pc-email">${p.usuario}</div>
+        <div class="pc-vals">
+          <span class="pc-tag badge-pago">Pago: ${fmt(p.pago)}</span>
+          <span class="pc-tag badge-prev">Prev: ${fmt(p.previsto)}</span>
+          ${p.atraso>0?`<span class="pc-tag badge-atr">Atraso: ${fmt(p.atraso)}</span>`:""}
+        </div>
+        <button class="btn-wpp-sm" onclick="enviarWpp('${p.wpp}','${p.nome}',${p.previsto})">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.522 5.847L.057 23.882l6.19-1.622A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.793 9.793 0 01-4.988-1.365l-.358-.214-3.71.973.99-3.614-.233-.372A9.794 9.794 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+          Enviar WhatsApp
+        </button>
+      </div>`).join("");
+  } catch(e){lst.innerHTML='<div class="empty">Erro ao carregar.</div>';}
+}
+
+function enviarWpp(wpp,nome,prev){
+  const mes=new Date().toLocaleString("pt-BR",{month:"long",year:"numeric"});
+  const msg=`Olá, ${nome}! 👋\n\nA *Tática Gestão Contábil* informa que seu recibo de comissão referente a *${mes}* já está disponível para assinatura.\n\n💰 *Valor: ${fmtK(prev)}*\n\n✍️ Acesse o link para assinar:\nhttps://centraldeparceiros.netlify.app\n\n📞 (82) 3024-3993`;
+  window.open(`https://wa.me/${wpp}?text=${encodeURIComponent(msg)}`,"_blank");
+}
+
+document.getElementById("inp-busca").addEventListener("keydown",e=>e.key==="Enter"&&buscar());
+document.getElementById("inp-pass").addEventListener("keydown",e=>e.key==="Enter"&&doLogin());
+</script>
+</body>
+</html>
